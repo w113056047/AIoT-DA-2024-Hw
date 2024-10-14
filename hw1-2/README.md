@@ -2,6 +2,8 @@
 
 
 > This is a homework program finished by natural language programming. Here is the chatgpt prompt [link](https://chatgpt.com/share/670d4754-3660-8013-a775-9fc8ce3f7c29) to the program.
+>
+> demo: ![gif](./demo.gif)
 
 This Streamlit app performs multiple linear regression using Lasso for feature selection, following the CRISP-DM (Cross Industry Standard Process for Data Mining) methodology. The app allows you to fetch a dataset from the web, perform feature engineering using one-hot encoding for categorical variables, select the target variable, and run Lasso to determine the most relevant features. Finally, it displays the model’s performance and allows users to view random prediction results.
 
