@@ -24,39 +24,38 @@ pip install streamlit scikit-learn pandas numpy requests
 
 ## Usage
 
-	1.	Clone or download this repository.
-	2.	Run the Streamlit app using the command:
+1. Clone or download this repository.
+2. Run the Streamlit app using the command:
+   ```bash
+   streamlit run main.py
+   ```
 
-        ```bash
-        streamlit run your_script.py
-        ```
-
-	3.	In the app:
-	•	Enter the URL for your dataset (CSV format).
-	•	Select the categorical columns to one-hot encode.
-	•	Choose the target column for prediction.
-	•	The app will automatically apply Lasso regression for feature selection.
-	•	You can view model performance metrics (MSE and R-squared).
-	•	Use the dropdown to select the number of random predictions to display.
-	•	Press the Refresh Results button to get a new set of random predictions.
+3. In the app:
+    * Enter the URL for your dataset (CSV format).
+    * Select the categorical columns to one-hot encode.
+    * Choose the target column for prediction.
+    * The app will automatically apply Lasso regression for feature selection.
+    * You can view model performance metrics (MSE and R-squared).
+    * Use the dropdown to select the number of random predictions to display.
+    * Press the Refresh Results button to get a new set of random predictions.
 
 ## Example
 
 Here’s a sample workflow:
 
-	1.	Enter the URL of a dataset, such as https://example.com/data.csv.
-	2.	Select categorical columns like Gender, Country for one-hot encoding.
-	3.	Choose the target column for prediction, e.g., Price.
-	4.	View the selected features, model evaluation metrics, and random predictions.
+ 1. Enter the URL of a dataset, such as https://example.com/data.csv.
+ 2. Select categorical columns like Gender, Country for one-hot encoding.
+ 3. Choose the target column for prediction, e.g., Price.
+ 4. View the selected features, model evaluation metrics, and random predictions.
 
 ## CRISP-DM Steps
 
-	1.	Business Understanding: The app focuses on predicting a target variable (e.g., prices, sales) using linear regression.
-	2.	Data Understanding: Users can explore the dataset through the app’s data overview.
-	3.	Data Preparation: Feature engineering with one-hot encoding is applied to categorical variables.
-	4.	Modeling: Lasso regression is used for feature selection, followed by linear regression for predictions.
-	5.	Evaluation: Model performance is evaluated using mean squared error and R-squared.
-	6.	Deployment: The results are displayed in an interactive interface with Streamlit.
+1. Business Understanding: The app focuses on predicting a target variable (e.g., prices, sales) using linear regression.
+2. Data Understanding: Users can explore the dataset through the app’s data overview.
+3. Data Preparation: Feature engineering with one-hot encoding is applied to categorical variables.
+4. Modeling: Lasso regression is used for feature selection, followed by linear regression for predictions.
+5. Evaluation: Model performance is evaluated using mean squared error and R-squared.
+6. Deployment: The results are displayed in an interactive interface with Streamlit.
 
 ## License
 
