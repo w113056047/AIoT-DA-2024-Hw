@@ -53,48 +53,46 @@ if data is not None:
 
     # Step 3: Feature Selection using Lasso
     st.subheader("Feature Selection using Lasso Regression")
-    target_col = st.selectbox("Select the target column for prediction:", data.columns)
+    
+    # Assuming the target column is the last column
+    target = data.iloc[:, -1]
+    features = data.iloc[:, :-1]
+    
+    # Splitting the data
+    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
 
-    if target_col:
-        # Remove target from the feature list
-        features = data.drop(columns=[target_col])
-        target = data[target_col]
+    # Use Lasso Regression for feature selection
+    lasso_model = Lasso(alpha=0.1)
+    lasso_model.fit(X_train, y_train)
+    
+    # Get the selected features (non-zero coefficients)
+    selected_features = features.columns[lasso_model.coef_ != 0]
+    
+    st.write(f"Selected Features by Lasso: {list(selected_features)}")
+
+    # Step 4: Use the selected features for prediction with Linear Regression
+    if len(selected_features) > 0:
+        X_train_selected = X_train[selected_features]
+        X_test_selected = X_test[selected_features]
         
-        # Splitting the data
-        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
+        model = LinearRegression()
+        model.fit(X_train_selected, y_train)
 
-        # Use Lasso Regression for feature selection
-        lasso_model = Lasso(alpha=0.1)
-        lasso_model.fit(X_train, y_train)
-        
-        # Get the selected features (non-zero coefficients)
-        selected_features = features.columns[lasso_model.coef_ != 0]
-        
-        st.write(f"Selected Features by Lasso: {list(selected_features)}")
+        # Predict on the test set using selected features
+        y_pred = model.predict(X_test_selected)
 
-        # Step 4: Use the selected features for prediction with Linear Regression
-        if len(selected_features) > 0:
-            X_train_selected = X_train[selected_features]
-            X_test_selected = X_test[selected_features]
-            
-            model = LinearRegression()
-            model.fit(X_train_selected, y_train)
+        # Evaluation Metrics (using mean squared error)
+        st.subheader("Model Evaluation")
+        mse = mean_squared_error(y_test, y_pred)
+        r2 = model.score(X_test_selected, y_test)
 
-            # Predict on the test set using selected features
-            y_pred = model.predict(X_test_selected)
+        st.write(f"Mean Squared Error (MSE): {mse}")
+        st.write(f"R-squared: {r2}")
 
-            # Evaluation Metrics (using root mean squared error)
-            st.subheader("Model Evaluation")
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = model.score(X_test_selected, y_test)
-
-            st.write(f"Root Mean Squared Error (RMSE): {rmse}")
-            st.write(f"R-squared: {r2}")
-
-            # Displaying the results
-            st.write("Predictions vs Actual:")
-            result_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-            st.write(result_df.head())
+        # Displaying the results
+        st.write("Predictions vs Actual:")
+        result_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+        st.write(result_df.head())
 
 else:
     st.error("Please provide a valid data source URL.")
