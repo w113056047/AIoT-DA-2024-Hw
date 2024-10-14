@@ -3,15 +3,15 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import root_mean_squared_error, r2_score
+from sklearn.linear_model import Lasso, LinearRegression
+from sklearn.metrics import mean_squared_error
 import requests
 from io import StringIO
 
 # Step 1: Define data source (using a Streamlit text input for the URL)
-st.title("Multiple Linear Regression using CRISP-DM")
+st.title("Multiple Linear Regression using CRISP-DM with Lasso Feature Selection")
 
-url = st.text_input("Enter the URL of your dataset:", "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv")
+url = st.text_input("Enter the URL of your dataset:", "https://example.com/data.csv")
 
 @st.cache_data
 def load_data(url):
@@ -37,21 +37,22 @@ if data is not None:
     # Step 2: Feature Engineering (One-Hot Encoding)
     st.subheader("Feature Engineering")
 
-    category_col = st.selectbox("Select the categorical column to encode:", data.columns)
+    # Select multiple categorical columns for encoding
+    category_cols = st.multiselect("Select the categorical columns to encode:", data.columns)
     
-    if category_col:
+    if category_cols:
         encoder = OneHotEncoder()
-        cat_encoded = encoder.fit_transform(data[[category_col]]).toarray()
-        cat_encoded_df = pd.DataFrame(cat_encoded, columns=encoder.get_feature_names_out([category_col]))
+        cat_encoded = encoder.fit_transform(data[category_cols]).toarray()
+        cat_encoded_df = pd.DataFrame(cat_encoded, columns=encoder.get_feature_names_out(category_cols))
         
-        # Drop the original category column and concatenate the encoded data
-        data = pd.concat([data.drop(columns=[category_col]), cat_encoded_df], axis=1)
+        # Drop the original categorical columns and concatenate the encoded data
+        data = pd.concat([data.drop(columns=category_cols), cat_encoded_df], axis=1)
         
         st.write("Data after One-Hot Encoding:")
         st.write(data.head())
 
-    # Step 3: Feature Selection (Simplified using correlation or any method)
-    st.subheader("Feature Selection")
+    # Step 3: Feature Selection using Lasso
+    st.subheader("Feature Selection using Lasso Regression")
     target_col = st.selectbox("Select the target column for prediction:", data.columns)
 
     if target_col:
@@ -62,25 +63,38 @@ if data is not None:
         # Splitting the data
         X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
 
-        # Step 4: Model Building (Multiple Linear Regression)
-        model = LinearRegression()
-        model.fit(X_train, y_train)
+        # Use Lasso Regression for feature selection
+        lasso_model = Lasso(alpha=0.1)
+        lasso_model.fit(X_train, y_train)
+        
+        # Get the selected features (non-zero coefficients)
+        selected_features = features.columns[lasso_model.coef_ != 0]
+        
+        st.write(f"Selected Features by Lasso: {list(selected_features)}")
 
-        # Predict on the test set
-        y_pred = model.predict(X_test)
+        # Step 4: Use the selected features for prediction with Linear Regression
+        if len(selected_features) > 0:
+            X_train_selected = X_train[selected_features]
+            X_test_selected = X_test[selected_features]
+            
+            model = LinearRegression()
+            model.fit(X_train_selected, y_train)
 
-        # Evaluation Metrics
-        st.subheader("Model Evaluation")
-        mse = root_mean_squared_error(y_test, y_pred)
-        r2 = r2_score(y_test, y_pred)
+            # Predict on the test set using selected features
+            y_pred = model.predict(X_test_selected)
 
-        st.write(f"Mean Squared Error (MSE): {mse}")
-        st.write(f"R-squared: {r2}")
+            # Evaluation Metrics (using root mean squared error)
+            st.subheader("Model Evaluation")
+            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+            r2 = model.score(X_test_selected, y_test)
 
-        # Displaying the results
-        st.write("Predictions vs Actual:")
-        result_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-        st.write(result_df.head())
+            st.write(f"Root Mean Squared Error (RMSE): {rmse}")
+            st.write(f"R-squared: {r2}")
+
+            # Displaying the results
+            st.write("Predictions vs Actual:")
+            result_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+            st.write(result_df.head())
 
 else:
     st.error("Please provide a valid data source URL.")
