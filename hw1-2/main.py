@@ -91,10 +91,18 @@ if data is not None:
             st.write(f"Mean Squared Error (MSE): {mse}")
             st.write(f"R-squared: {r2}")
 
-            # Displaying the results
-            st.write("Predictions vs Actual:")
-            result_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-            st.write(result_df.head())
+            # Display random predictions with user control
+            st.subheader("Display Random Prediction Results")
+            count = st.selectbox("Select number of random rows to display:", [5, 10, 20, 50])
+
+            # Refresh button
+            if st.button("Refresh Results"):
+                # Create a DataFrame with actual and predicted values
+                result_df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+                result_df = result_df.sample(n=count, random_state=np.random.randint(1, 1000))  # Random selection
+
+                # Display the selected number of random rows
+                st.write(result_df)
 
 else:
     st.error("Please provide a valid data source URL.")
