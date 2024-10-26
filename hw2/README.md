@@ -2,6 +2,8 @@
 
 This project aims to predict the survival of passengers on the Titanic using machine learning techniques. The dataset used for this project is from the [Kaggle Titanic competition](https://www.kaggle.com/c/titanic).
 
+![demo](demo.gif)
+
 ## Note
 
 This project was created using natural language programming with github copilot. The chat log is at [chat_log.md](chat.md).
